@@ -28,7 +28,9 @@ function Invoke-Sharky {
   #>
 
   [CmdletBinding()]
-  Param()
+  Param(
+    [String]$Output=""
+  )
   # ============================== #
   # = Helper Functions
   # ============================== #
@@ -109,6 +111,15 @@ function Invoke-Sharky {
         Write-ColorOutput -ForegroundColor Green -Object "[*] Path: $historyFile"
       }
       Write-ColorOutput -Object ""
+    }
+  }
+
+  function RunCommands($commands) {
+    foreach ($command in $commands.GetEnumerator()) {
+
+        Header -Title $Command.Name
+        Invoke-Expression $command.Value
+
     }
   }
 
@@ -202,7 +213,7 @@ function Invoke-Sharky {
 
   # PERSONALLY ADDED / CHOSEN COMMANDS
   # Basic System Information
-  $commands.Add('Basic System Information Results', 'Start-Process "systeminfo" -NoNewWindow -Wait | ft')
+  $commands.Add('Basic System Information Results', 'systeminfo.exe /S $ComputerName /FO LIST | ft')
   # PowerShell Histories
   $commands.Add('Find PowerShell Histories', 'FindPSHistories')
   # User Directories
@@ -222,14 +233,15 @@ function Invoke-Sharky {
     Write-ColorOutput -ForegroundColor Green -Object "[*] You ran this script on $(Get-Date)"
     Write-ColorOutput -Object ""
 
-    foreach ($command in $commands.GetEnumerator()) {
-      Header -Title $Command.Name
-      Invoke-Expression $command.Value
-    }
+    RunCommands $commands
   }
 
   # ============================== #
   # = Execution
   # ============================== #
-  Main
+  if ($Output -eq "") {
+    Main
+  } else {
+    Main | Out-File -FilePath $Output
+  }
 }
