@@ -66,6 +66,7 @@ function Invoke-Sharky {
 
   # Get-Process | select Name, Path, Company, Description, Product, ProductVersion, FileVersion, StartTime, @{Name="Owner";Expression={(Get-WmiObject -Class Win32_Process -Filter "ProcessId = $($_.Id)").GetOwner().User}}
 
+
   # ============================== #
   # = Commands
   # ============================== #
