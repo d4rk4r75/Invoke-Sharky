@@ -105,7 +105,7 @@ function Invoke-Sharky {
     'User Autologon Registry Items'                                           = 'Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\WinLogon" | select "Default*" | ft';
     'Software in Registry'                                                    = 'Get-ChildItem -path Registry::HKEY_LOCAL_MACHINE\SOFTWARE | Format-Table -AutoSize';
     'Drivers'                                                                 = 'driverquery.exe /v /fo csv | ConvertFrom-CSV | Select-Object "Display Name","Start Mode","State","Status","Path","Service Name" | Format-Table -AutoSize';
-    'Check Putty Credentials'                                                 = 'reg query "HKCU\Software\SimonTatham\PuTTY\Sessions" /t REG_SZ /';
+    'Putty Credentials'                                                       = 'reg query "HKCU\Software\SimonTatham\PuTTY\Sessions" /t REG_SZ /';
   }
 # Get-ChildItem -Path C:\ -Include *.kdbx -File -Recurse -ErrorAction SilentlyContinue
 
