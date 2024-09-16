@@ -84,8 +84,8 @@ function Invoke-Sharky {
     'Environment Variables'                                                   = 'Get-ChildItem Env: | Format-Table Key,Value -AutoSize ';
     'User Privileges'                                                         = 'whoami /priv | Format-Table -Autosize';
     'Credential Manager'                                                      = 'cmdkey /list | Format-Table -AutoSize';
-    # 'Folders and Files in User Directories Results'                           = 'tree /F /A C:\Users'
-    # 'Folders and Files in C:\ Directories Results'                            = 'Get-ChildItem C:\ | Format-Table -AutoSize'; Name'
+    'Folders and Files in User Directories Results'                           = 'tree /F /A C:\Users'
+    'Folders and Files in C:\ Directories Results'                            = 'Get-ChildItem C:\ | Format-Table -AutoSize';
     'Folders with Everyone Permissions'                                       = 'Get-ChildItem "C:\Program Files\*", "C:\Program Files (x86)\*" | % { try { Get-Acl $_ -EA SilentlyContinue | Where {($_.Access|select -ExpandProperty IdentityReference) -match "Everyone"} } catch {}} | Format-Table -AutoSize';
     'Folders with BUILTIN User Permissions'                                   = 'Get-ChildItem "C:\Program Files\*", "C:\Program Files (x86)\*" | % { try { Get-Acl $_ -EA SilentlyContinue | Where {($_.Access|select -ExpandProperty IdentityReference) -match "BUILTIN\Users"} } catch {}} | Format-Table -AutoSize';
     'Network Information'                                                     = 'Get-NetIPConfiguration -Detailed -All'
@@ -98,14 +98,14 @@ function Invoke-Sharky {
     'Local Users'                                                             = 'Get-LocalUser | Format-Table -AutoSize';
     'Local Groups'                                                            = 'Get-LocalGroup | Format-Table -AutoSize';
     'Local Administrators'                                                    = 'Get-LocalGroupMember -Group Administrators | Format-Table -AutoSize';
-    # 'Running Processes'                                                       = 'Get-Process | select Name, Path, Company, Description, Product, ProductVersion, FileVersion, StartTime, @{Name="Owner";Expression={(Get-WmiObject -Class Win32_Process -Filter "ProcessId = $($_.Id)").GetOwner().User}} | ft';
-    'Running Processes'                                                       = 'Get-Process | where {$_.ProcessName -notlike "svchost*"} | Format-Table -AutoSize';
+    'Running Processes'                                                       = 'Get-Process | select Name, Path, Company, Description, Product, ProductVersion, FileVersion, StartTime, @{Name="Owner";Expression={(Get-WmiObject -Class Win32_Process -Filter "ProcessId = $($_.Id)").GetOwner().User}} | ft';
+    'Running Processes Excluding svchost'                                     = 'Get-Process | where {$_.ProcessName -notlike "svchost*"} | Format-Table -AutoSize';
     'Scheduled Tasks'                                                         = 'schtasks /query /fo CSV /v | ConvertFrom-Csv | Select-Object TaskName,Author,Status,"Scheduled Task State","Schedule Type","Run As User","Next Run Time","Last Run Time","Last Result","Task To Run"';
     'Services'                                                                = 'Get-Service | Format-Table -AutoSize';
     'User Autologon Registry Items'                                           = 'Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\WinLogon" | select "Default*" | ft';
     'Software in Registry'                                                    = 'Get-ChildItem -path Registry::HKEY_LOCAL_MACHINE\SOFTWARE | Format-Table -AutoSize';
     'Drivers'                                                                 = 'driverquery.exe /v /fo csv | ConvertFrom-CSV | Select-Object "Display Name","Start Mode","State","Status","Path","Service Name" | Format-Table -AutoSize';
-    'Putty Credentials'                                                       = 'Get-ItemProperty -Path "Registry::HKEY_CURRENT_USER\Software\SimonTatham\PuTTY\Sessions"';
+    'Putty Credentials'                                                       = 'reg query HKEY_CURRENT_USER\Software\<USERNAME>\PuTTY\Sessions\ /f "Proxy" /s';
   }
 # Get-ChildItem -Path C:\ -Include *.kdbx -File -Recurse -ErrorAction SilentlyContinue
 
@@ -120,7 +120,7 @@ function Invoke-Sharky {
 
   function CleanUp {
     # Archive the results
-    Compress-Archive -Path "C:\Workspace\Sharky\*" -DestinationPath "C:\Workspace\Sharky.zip"
+    Compress-Archive -Path "C:\Workspace\Sharky\*" -DestinationPath "C:\Workspace\Sharky_$env:COMPUTERNAME-$(Get-Date -Format 'yyyy-MM-dd-HHmmss').zip"
     Remove-Item -Path "C:\Workspace\Sharky" -Recurse -Force
   }
 
